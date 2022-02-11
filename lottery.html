@@ -1,0 +1,717 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link rel="icon" href="/favicon.png">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" />
+    <script src="javascripts/jquery-3.5.1.min.js"></script>
+    <script src="javascripts/jquery-ui.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <style>
+        * {
+            font-family: 'Source Code Pro', monospace;
+            color: white;
+        }
+
+        body {
+            background-color: #2D2D2D;
+        }
+
+        #outer {
+            vertical-align: middle;
+            height: 100%;
+        }
+
+        fieldset {
+            background-color: rgba(255, 255, 255, 0.07);
+            border-radius: 10px;
+            box-shadow: 2px 2px 12px #232323;
+        }
+
+        legend.scheduler-border {
+            width: auto;
+            padding: 0 20px;
+            border-bottom: none;
+        }
+
+        #confirm {
+            min-height: 430px;
+        }
+
+        #info {
+            height: 430px;
+        }
+
+        .modal * {
+            color: black;
+        }
+
+        .modal {
+            position: absolute !important;
+            left: 20% !important;
+            top: -50% !important;
+            max-width: 100% !important;
+        }
+
+        .modal-dialog {
+            max-width: 100%;
+            width: auto !important;
+            display: inline-block;
+        }
+
+        .nor {
+            color: #D10000;
+            font-weight: 900 !important;
+            text-decoration: underline;
+        }
+
+        .spec {
+            color: #08AD00;
+            font-weight: 900 !important;
+            text-decoration: underline;
+        }
+
+        .modal-header {
+            padding: 9px 15px;
+            border-bottom: 1px solid #eee;
+            background-color: #CFF1FB;
+            -webkit-border-top-left-radius: 5px;
+            -webkit-border-top-right-radius: 5px;
+            -moz-border-radius-topleft: 5px;
+            -moz-border-radius-topright: 5px;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+
+        .flex-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .btn {
+            box-shadow: 1px 1px 4px #303030;
+        }
+
+
+        .btn:focus {
+            box-shadow: none;
+        }
+
+        .nums {
+            display: none;
+        }
+
+        .nums+label {
+            color: white;
+            display: inline-flex;
+            text-align: center;
+            width: 17px;
+            background-color: #303030;
+            padding: 6px 10px;
+            margin: 5px;
+            box-shadow: 1px 1px 3px #6D6D6D;
+            border-radius: 3px;
+        }
+
+        label.selected {
+            background-color: #0DB8F6;
+            box-shadow: 1px 2px 4px #212121;
+            font-weight: bolder;
+        }
+
+        .nums+label:hover {
+            background-color: #606060;
+        }
+
+        #div1 {
+            height: 50px;
+            color: #D6D6D6;
+        }
+
+        input[type=button] {
+            margin: 5px;
+        }
+
+        .btn-secondary,
+        .btn-secondary:focus {
+            background-color: #C4C4C4;
+            color: black;
+        }
+
+        .btn-secondary:hover {
+            background-color: #A3A3A3;
+        }
+    </style>
+    <script type="text/javascript">
+        $(function () {
+
+            var lot = [];
+
+            $(".nums").change(function () {
+
+                lot = [];
+                $("#div1").html('');
+                $(".nums").attr("disabled", false);
+
+                if ($(this).is(":checked")) {
+                    $(this).next().addClass('selected');
+                } else {
+                    $(this).next().removeClass('selected');
+                }
+
+                $(".nums:checked").each(function (index, element) {
+                    lot.push($(element).val());
+                });
+
+                for (var i = 0; i < lot.length; i++) {
+                    var arr = lot[i].toString().split('');
+                    if (arr.length == 1) {
+                        lot[i] = "0" + lot[i].toString();
+                    }
+                };
+
+                $.each(lot, function (i, e) {
+                    if (i < lot.length - 1) {
+                        $('#div1').append(lot[i] + " ");
+                    }
+                    else
+                        $('#div1').append(lot[i]);
+                });
+
+                if (lot.length == 6) {
+                    $(".nums:not(:checked)").attr('disabled', true);
+                }
+            });
+
+            $("#btn1").click(function () {
+                if (lot.length < 6) {
+                    $("#alert1").html("<strong class='text-dark'>請選擇六個號碼 !</strong>").addClass("show");
+                    setTimeout(function () {
+                        $("#alert1").html("").removeClass("show");
+                    }, 2000);
+
+                    return;
+                }
+                $('#div1').html('');
+                var s = '';
+
+                $.each(lot, function (i, e) {
+                    if (i < lot.length - 1) {
+                        s += (lot[i] + " ");
+                    }
+                    else s += lot[i];
+                });
+
+                $("#div2").append("<div class='row my-2 offset-md-1 col-md-11 offset-2 col-10 align-self-center'><span class='align-self-center h5 mb-0'>" + s + "</span><input id='delete' class='mx-4 btn btn-danger btn-sm' type='button' value='刪除'/></div>");
+
+                $("label").removeClass('selected');
+                $(".nums").prop("checked", false);
+                $(".nums").attr("disabled", false);
+                lot = [];
+            });
+
+
+
+            $("#btn2").click(function () {
+
+                if (lot.length != 0) {
+                    var c = confirm("確定要取消原本選取的號碼嗎?")
+                    if (c == false) return;
+                }
+
+                $("label").removeClass('selected');
+                $(".nums").prop("checked", false);
+                $(".nums").attr("disabled", false);
+                lot = [];
+
+                //隨機選六個號碼
+                while (lot.length < 6) {
+                    var n = parseInt((Math.random() * 50), 10);
+                    if (n == 0) continue;
+                    if (lot.includes(n)) continue;
+
+                    lot.push(n);
+                };
+
+                //選取
+                for (var i = 0; i < lot.length; i++) {
+                    var v = parseInt(lot[i]);
+                    $(`.nums#${v}`).prop('checked', true);
+                    $(`label[for=${v}]`).addClass('selected');
+                };
+
+                //bubble sort
+                for (var i = 0; i < lot.length - 1; i++) {
+                    for (var j = 0; j < lot.length - 1; j++) {
+                        var x = lot[j];
+                        var y = lot[j + 1];
+                        if (x > y) {
+                            lot[j] = y;
+                            lot[j + 1] = x;
+                        }
+                    }
+                };
+
+                //補零
+                for (var i = 0; i < lot.length; i++) {
+                    if (lot[i] < 10) {
+                        lot[i] = "0" + lot[i].toString();
+                    }
+                };
+
+                //print在div1
+                var s = '';
+                $.each(lot, function (i, e) {
+                    if (i < lot.length - 1) {
+                        s += (lot[i] + " ");
+                    }
+                    else s += lot[i];
+                });
+                $("#div1").html(s);
+                $(".nums:not(:checked)").attr('disabled', true);
+            });
+
+            $("#btn3").click(function () {
+                while (lot.length < 6) {
+                    var n = parseInt((Math.random() * 50), 10).toString();
+                    if (n == 0) continue;
+
+                    var arr = n.split('');
+                    if (arr.length == 1) {
+                        n = "0" + n;
+                    }
+                    if (lot.includes(n)) continue;
+
+                    lot.push(n);
+                };
+
+                for (var i = 0; i < lot.length; i++) {
+                    var v = parseInt(lot[i]);
+                    $(`.nums#${v}`).prop('checked', true);
+                    $(`label[for=${v}]`).addClass('selected');
+
+                };
+
+                for (var i = 0; i < lot.length - 1; i++) {
+                    for (var j = 0; j < lot.length - 1; j++) {
+                        var x = lot[j];
+                        var y = lot[j + 1];
+                        if (x > y) {
+                            lot[j] = y;
+                            lot[j + 1] = x;
+                        }
+                    }
+                };
+
+                for (var i = 0; i < lot.length; i++) {
+                    var arr = lot[i].toString().split('');
+                    if (arr.length == 1) {
+                        lot[i] = "0" + lot[i].toString();
+                    }
+                };
+
+                var s = '';
+
+                $.each(lot, function (i, e) {
+                    if (i < lot.length - 1) {
+                        s += (lot[i] + " ");
+                    }
+                    else s += lot[i];
+                });
+
+                $("#div1").html(s);
+                $(".nums:not(:checked)").attr('disabled', true);
+            });
+
+
+
+            $("#btn4").click(function () {
+                var len = lot.length;
+                if (len == 6) return;
+
+                while (lot.length < len + 1) {
+                    var n = parseInt((Math.random() * 50), 10).toString();
+                    if (n == 0) continue;
+
+                    var arr = n.split('');
+                    if (arr.length == 1) {
+                        n = "0" + n;
+                    }
+                    if (lot.includes(n)) continue;
+
+                    lot.push(n);
+                };
+
+                for (var i = 0; i < lot.length; i++) {
+                    var v = parseInt(lot[i]);
+                    $(`.nums#${v}`).prop('checked', true);
+                    $(`label[for=${v}]`).addClass('selected');
+                };
+
+                for (var i = 0; i < lot.length - 1; i++) {
+                    for (var j = 0; j < lot.length - 1; j++) {
+                        var x = lot[j];
+                        var y = lot[j + 1];
+                        if (x > y) {
+                            lot[j] = y;
+                            lot[j + 1] = x;
+                        }
+                    }
+                };
+
+                for (var i = 0; i < lot.length; i++) {
+                    var arr = lot[i].toString().split('');
+                    if (arr.length == 1) {
+                        lot[i] = "0" + lot[i].toString();
+                    }
+                };
+
+                var s = '';
+
+                $.each(lot, function (i, e) {
+                    if (i < lot.length - 1) {
+                        s += (lot[i] + " ");
+                    }
+                    else s += lot[i];
+                });
+
+                $("#div1").html(s);
+
+                if (lot.length == 6) {
+                    $(".nums:not(:checked)").attr('disabled', true);
+                }
+            });
+
+            $("#btn5").click(function () {
+
+                $("label").removeClass('selected');
+                $(".nums").prop("checked", false);
+                $(".nums").attr("disabled", false);
+                lot = [];
+                $("#div1").html('');
+            });
+
+            $("#div2").on("click", "#delete", function (e) {
+                console.log(e.target);
+                $(e.target).parent("#div2 div").remove();
+            });
+
+            function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            function ani() {
+                $("label").removeClass('selected');
+                $(".nums").prop("checked", false);
+                $(".nums").attr("disabled", false);
+                var ani = [];
+
+                //隨機選六個號碼
+                while (ani.length < 6) {
+                    let n = parseInt((Math.random() * 50), 10);
+                    if (n == 0) continue;
+                    if (ani.includes(n)) continue;
+
+                    ani.push(n);
+                };
+
+                //選取
+                for (var j = 0; j < ani.length; j++) {
+                    var v = parseInt(ani[j]);
+                    $(`.nums#${v}`).prop('checked', true);
+                    $(`label[for=${v}]`).addClass('selected');
+                };
+            };
+
+            async function anime() {
+                for (let i = 0; i < 15; i++) {
+                    ani();
+                    await sleep(100);
+                }
+                $("label").removeClass('selected');
+                $(".nums").prop("checked", false);
+                $(".nums").attr("disabled", false);
+            }
+
+            var result = [];
+
+            $("#btn7").click(async function () {
+                if ($("#div2").is(":empty")) {
+                    $("#alert2").html("<strong class='text-dark'>&nbsp&nbsp您尚未選號!</strong>").addClass("show");
+                    setTimeout(function () {
+                        $("#alert2").html("").removeClass("show");
+                    }, 2000);
+                    return false;
+                }
+
+                $(this).prop('disabled', true);
+                await anime();
+                result = [];
+
+                //隨機選七個號碼
+                while (result.length < 7) {
+                    var n = parseInt((Math.random() * 50), 10);
+                    if (n == 0) continue;
+                    if (result.includes(n)) continue;
+
+                    result.push(n);
+                };
+
+                for (var i = 0; i < result.length - 2; i++) {
+                    for (var j = 0; j < result.length - 2; j++) {
+                        var x = result[j];
+                        var y = result[j + 1];
+                        if (x > y) {
+                            result[j] = y;
+                            result[j + 1] = x;
+                        }
+                    }
+                };
+
+                //補零
+                for (var i = 0; i < result.length; i++) {
+                    if (result[i] < 10) {
+                        result[i] = "0" + result[i].toString();
+                    }
+                };
+
+                //print在div3
+                var s = '';
+                $.each(result, function (i, e) {
+                    if (i == 0) {
+                        s += ("獎號 : " + result[i] + " ");
+                    }
+                    else if (i < result.length - 2) {
+                        s += (result[i] + " ");
+                    }
+                    else if (i == result.length - 2) {
+                        s += result[i];
+                    }
+                    else {
+                        s += ("&nbsp特別號 : " + result[i] + " ");
+                    }
+                });
+
+                $(".modal-body").html("<h3><strong>" + s + "</strong></h3></br>");
+                var arr = [];
+
+                $("#div2 span").each(function (index) {
+                    arr = $(this).html().split(" ");
+                    var s = '';
+                    $.each(arr, function (i, e) {
+                        var num = parseInt(arr[i]);
+                        if (i < arr.length - 1) {
+                            if (num < 10) {
+                                s += ("<span class='s" + num + "'>0" + num + "</span><span> </span>");
+                            }
+                            else {
+                                s += ("<span class='s" + num + "'>" + num + "</span><span> </span>");
+                            }
+                        }
+                        else {
+                            if (num < 10) {
+                                s += ("<span class='s" + num + "'>0" + num + "</span>");
+                            }
+                            else {
+                                s += ("<span class='s" + num + "'>" + num + "</span>");
+                            }
+                        }
+                    });
+
+                    var nor = 0;
+                    var spec = 0;
+                    $.each(arr, function (i, e) {
+                        $.each(result, function (index, value) {
+                            if (index == result.length - 1) {
+                                if (parseInt(arr[i]) == parseInt(result[index])) {
+                                    spec += 1;
+                                }
+                            }
+                            else {
+                                if (parseInt(arr[i]) == parseInt(result[index])) {
+                                    nor += 1;
+                                }
+                            }
+                        });
+                    });
+
+                    var price = '';
+                    if (spec == 1) {
+                        if (nor == 5) price = '&nbsp恭喜您中了<strong>貳獎!</strong>';
+                        if (nor == 4) price = '&nbsp恭喜您中了<strong>肆獎!</strong>';
+                        if (nor == 3) price = '&nbsp恭喜您中了<strong>陸獎!</strong>';
+                        if (nor == 2) price = '&nbsp恭喜您中了<strong>柒獎!</strong>';
+                    }
+                    else if (spec == 0) {
+                        if (nor == 6) price = '&nbsp恭喜您中了<strong>頭獎!!</strong>';
+                        if (nor == 5) price = '&nbsp恭喜您中了<strong>三獎!</strong>';
+                        if (nor == 4) price = '&nbsp恭喜您中了<strong>五獎!</strong>';
+                        if (nor == 3) price = '&nbsp恭喜您中了<strong>普獎!</strong>';
+                    }
+
+                    if (nor == 0 & spec == 0) {
+                        $(".modal-body").append("<div class='mt-2 h5'><span>" + s + "</span><span>&nbsp一個號碼都沒中 :(</span></div>");
+                    }
+                    else if (nor == 0 & spec != 0) {
+                        $(".modal-body").append("<div class='mt-2 h5'><span>" + s + "</span><span>&nbsp您對中特別號!</span></div>");
+                    }
+                    else if (spec == 0) {
+                        $(".modal-body").append("<div class='mt-2 h5'><span>" + s + "</span><span>&nbsp您對中" + nor + "個號碼!" + price + "</span></div>");
+                    }
+                    else {
+                        $(".modal-body").append("<div class='mt-2 h5'><span>" + s + "</span><span>&nbsp您對中" + nor + "個號碼及特別號!" + price + "</span></div>");
+                    }
+                });
+
+                $.each(result, function (index, value) {
+                    var n = parseInt(result[index]);
+                    if (index < result.length - 1) {
+                        $.each($(".s" + n), function (i, e) {
+                            console.log(e);
+                            $(".s" + n).eq(i).addClass("nor");
+                        })
+                    }
+                    else {
+                        $.each($(".s" + n), function (i, e) {
+                            console.log(e);
+                            $(".s" + n).eq(i).addClass("spec");
+                        })
+                    }
+                });
+
+                $('#Modal').modal('show');
+                $(this).prop('disabled', false);
+
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div id="outer" class="container">
+        <div class="row text-center">
+            <div class="offset-lg-1 col-lg-8 col-12 mt-5  p-6">
+                <h1 class="m-3">Lottery</h1>
+            </div>
+        </div>
+        <div class="row">
+            <fieldset class="offset-lg-1 col-lg-8 col-12 mt-3  p-1">
+                <legend class=" text-center"><strong>選 號</strong></legend>
+                <div class="row">
+                    <div class="row offset-xs-1 col-xs-5 px-5 py-2 ml-1">
+                        <script>
+                            for (var i = 1; i < 50; i++) {
+                                if (i < 10) {
+                                    var s = '<input type="checkbox" class="nums" value="' + i + '" id="' + i + '" /><label for="' + i + '" class="control-label justify-content-center col-sm-1 px-4">0' + i + '</label>';
+                                }
+                                else {
+                                    var s = '<input type="checkbox" class="nums" value="' + i + '" id="' + i + '" /><label for="' + i + '" class="control-label justify-content-center col-sm-1 px-4">' + i + '</label>';
+                                }
+                                document.write(s);
+                            }
+                        </script>
+                    </div>
+                    <div class="row  col-xs-5 px-5 py-3 ml-1">
+                        <input type="button" id="btn2" value="隨機全選" class="btn btn-secondary" />
+                        <input type="button" id="btn3" value="隨機補滿" class="btn btn-secondary" />
+                        <input type="button" id="btn4" value="隨機單選" class="btn btn-secondary" />
+                        <input type="button" id="btn5" value="全部清除" class="btn btn-warning" />
+                        <input type="button" id="btn1" value="確定選號" class="btn btn-success btn-lg" />
+                    </div>
+                </div>
+
+            </fieldset>
+            <div class="container offset-lg-1 col-lg-8 col-12 mt-3">
+                <div class="row align-items-center">
+                    <div class="col-xs-3 ml-3 mt-3 text-center">
+                        <div id="div1" class="h5 align-self-center pl-4"></div>
+                    </div>
+                    <div class="col-xs-3 ml-3 mt-2 align-self-center">
+                        <div id="alert1" class="alert alert-warning alert-dismissible fade text-dark"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <fieldset id="confirm" class="col-lg-6 col-12 text-center mb-5">
+                        <legend class=" text-center h5 pt-1"><strong>我 的 選 號</strong></legend>
+                        <div id="div2" class="row text-center pl-1"></div>
+                        <div id="alert2" class="alert alert-danger alert-dismissible fade mt-5 my-4 text-dark"></div>
+                    </fieldset>
+                    <div id="info" class="flex-container offset-lg-1 col-lg-5 col-12  text-center mt-3 ">
+                        <div id="div3">
+                            <table style="width:100%" class="table table-hover table-sm mt-2">
+                                <thead>
+                                    <tr>
+                                        <th>中獎方式</th>
+                                        <th>獎項</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>與當期六個獎號完全相同者</td>
+                                        <td>頭獎</td>
+                                    </tr>
+                                    <tr>
+                                        <td>對中當期獎號之任五碼＋特別號</td>
+                                        <td>貳獎</td>
+                                    </tr>
+                                    <tr>
+                                        <td>對中當期獎號之任五碼</td>
+                                        <td>參獎</td>
+                                    </tr>
+                                    <tr>
+                                        <td>對中當期獎號之任四碼＋特別號</td>
+                                        <td>肆獎</td>
+                                    </tr>
+                                    <tr>
+                                        <td>對中當期獎號之任四碼</td>
+                                        <td>伍獎</td>
+                                    </tr>
+                                    <tr>
+                                        <td>對中當期獎號之任三碼＋特別號</td>
+                                        <td>陸獎</td>
+                                    </tr>
+                                    <tr>
+                                        <td>對中當期獎號之任兩碼＋特別號</td>
+                                        <td>柒獎</td>
+                                    </tr>
+                                    <tr>
+                                        <td>對中當期獎號之任三碼</td>
+                                        <td>普獎</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <input type="button" id="btn7" value="開獎" class="btn btn-success btn-lg mb-4" />
+                    </div>
+                    <!--對話框-->
+                    <div class="modal modal-xl fade" id="Modal" tabindex="-1" role="dialog"
+                        aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel"><strong
+                                            class="text-dark">對獎結果</strong></h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body mt-3">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary text-light"
+                                        data-dismiss="modal">OK!</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
